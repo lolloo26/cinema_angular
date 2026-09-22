@@ -1,0 +1,35 @@
+<h1>Sezione Serie TV</h1>
+
+<div class="filtri">
+  <label for="select-genere-tv">Filtra per genere: </label>
+  <select id="select-genere-tv" (change)="filtraPerGenere($event)">
+    <option value="0">Tutte (Popolari)</option>
+    @for (g of generi(); track g.id) {
+      <option [value]="g.id">{{ g.name }}</option>
+    }
+  </select>
+</div>
+
+@if (caricamento()) {
+  <p class="caricamento">Caricamento in corso...</p>
+}
+
+@if (errore()) {
+  <p class="errore">{{ errore() }}</p>
+}
+
+@if (!caricamento() && !errore()) {
+  <div class="grid">
+    @for (s of listaSerie(); track s.id) {
+      <div class="card" [routerLink]="['/serie-tv', s.id]">
+        <img [src]="tmdb.getImageUrl(s.poster_path)" [alt]="s.name" />
+        <div class="card-body">
+          <h3>{{ s.name }}</h3>
+          <p class="voto">⭐ {{ s.vote_average }}</p>
+        </div>
+      </div>
+    } @empty {
+      <p>Nessuna serie TV trovata.</p>
+    }
+  </div>
+}

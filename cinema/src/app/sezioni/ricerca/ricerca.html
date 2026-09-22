@@ -1,0 +1,75 @@
+<h1>Ricerca Unica</h1>
+
+<div class="search-bar" style="display: flex; gap: 0.5rem; margin-bottom: 2rem;">
+  <input 
+    type="text" 
+    [value]="query()" 
+    (input)="onInput($event)" 
+    (keyup.enter)="cerca()"
+    placeholder="Cerca film, serie tv o persone..." 
+    style="flex: 1; max-width: 500px;"
+  />
+  <button (click)="cerca()" [disabled]="caricamento()">Cerca</button>
+</div>
+
+@if (caricamento()) {
+  <p class="caricamento">Ricerca in corso...</p>
+}
+
+@if (errore()) {
+  <p class="errore">{{ errore() }}</p>
+}
+
+@if (cercato() && !caricamento() && !errore()) {
+  @if (risultati().length === 0) {
+    <p>Nessun risultato trovato per "{{ query() }}".</p>
+  } @else {
+    <!-- Categoria Film -->
+    @if (film().length > 0) {
+      <h2>🎬 Film ({{ film().length }})</h2>
+      <div class="grid" style="margin-bottom: 2.5rem;">
+        @for (f of film(); track f.id) {
+          <div class="card" [routerLink]="['/film', f.id]">
+            <img [src]="tmdb.getImageUrl(f.poster_path)" [alt]="f.title" />
+            <div class="card-body">
+              <h3>{{ f.title }}</h3>
+              <p class="voto">⭐ {{ f.vote_average }}</p>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Categoria Serie TV -->
+    @if (serie().length > 0) {
+      <h2>📺 Serie TV ({{ serie().length }})</h2>
+      <div class="grid" style="margin-bottom: 2.5rem;">
+        @for (s of serie(); track s.id) {
+          <div class="card" [routerLink]="['/serie-tv', s.id]">
+            <img [src]="tmdb.getImageUrl(s.poster_path)" [alt]="s.name" />
+            <div class="card-body">
+              <h3>{{ s.name }}</h3>
+              <p class="voto">⭐ {{ s.vote_average }}</p>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Categoria Persone -->
+    @if (persone().length > 0) {
+      <h2>👤 Persone ({{ persone().length }})</h2>
+      <div class="grid" style="margin-bottom: 2.5rem;">
+        @for (p of persone(); track p.id) {
+          <div class="card" [routerLink]="['/persona', p.id]">
+            <img [src]="tmdb.getImageUrl(p.profile_path)" [alt]="p.name" />
+            <div class="card-body">
+              <h3>{{ p.name }}</h3>
+              <p class="voto">Ruolo: {{ p.known_for_department || 'Spettacolo' }}</p>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+}

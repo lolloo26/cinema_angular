@@ -1,14 +1,13 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-import { Film, Genere, Persona, SerieTv } from './tmdb.model';
 
 @Injectable({ providedIn: 'root' })
 export class Tmdb {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = 'https://api.themoviedb.org/3';
   
-  // INSERISCI QUI IL TUO API READ ACCESS TOKEN (v4)
+  // Sostituisci con il tuo API Read Access Token (v4)
   private readonly accessToken = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI2ZDI4NmUzZGE1OGQyZjU5NTgxMmJiY2VkNThjODVmMiIsIm5iZiI6MTc5MDA2NTcxNC43Miwic3ViIjoiNmFiMjNjMzIxMDBiMGE4YWQzNjJjODdjIiwic2NvcGVzIjpbImFwaV9yZWFkIl0sInZlcnNpb24iOjF9.35LwF1cWJx3Dig5109SQKt1HDITM4P2Ub7KnJqL9t-U';
 
   private get headers(): HttpHeaders {
@@ -18,46 +17,80 @@ export class Tmdb {
     });
   }
 
-  // Costruisce l'URL completo delle immagini (sezione 4 del PDF)
-  getImageUrl(path: string | undefined, size: string = 'w500'): string {
-    return path ? `https://image.tmdb.org/t/p/${size}${path}` : 'https://via.placeholder.com/500x750?text=No+Image';
+  // Costruzione URL immagini (sezione 4 del PDF)
+  getImageUrl(path: string | null | undefined, size: string = 'w500'): string {
+    return path 
+      ? `https://image.tmdb.org/t/p/${size}${path}` 
+      : 'https://via.placeholder.com/500x750?text=Nessuna+Immagine';
   }
 
-  // 1. Film Popolari
-  async getFilmPopolari(): Promise<Film[]> {
-    const res = await firstValueFrom(
-      this.http.get<{ results: Film[] }>(`${this.baseUrl}/movie/popular`, { headers: this.headers })
-    );
-    return res.results;
-  }
-
-  // 2. Film per Genere
-  async getGeneriFilm(): Promise<Genere[]> {
-    const res = await firstValueFrom(
-      this.http.get<{ genres: Genere[] }>(`${this.baseUrl}/genre/movie/list`, { headers: this.headers })
-    );
-    return res.genres;
-  }
-
-  async getFilmPerGenere(genreId: number): Promise<Film[]> {
-    const res = await firstValueFrom(
-      this.http.get<{ results: Film[] }>(`${this.baseUrl}/discover/movie?with_genres=${genreId}`, { headers: this.headers })
-    );
-    return res.results;
-  }
-
-  // 3. Scheda Film
-  async getDettaglioFilm(id: number): Promise<any> {
+  // --- SEZIONE FILM ---
+  getFilmPopolari(): Promise<any> {
     return firstValueFrom(
-      this.http.get<any>(`${this.baseUrl}/movie/${id}?append_to_response=credits`, { headers: this.headers })
+      this.http.get(`${this.baseUrl}/movie/popular`, { headers: this.headers })
     );
   }
 
-  // 4. Ricerca Unica (multi)
-  async cercaMulti(query: string): Promise<any[]> {
-    const res = await firstValueFrom(
-      this.http.get<{ results: any[] }>(`${this.baseUrl}/search/multi?query=${encodeURIComponent(query)}`, { headers: this.headers })
+  getGeneriFilm(): Promise<any> {
+    return firstValueFrom(
+      this.http.get(`${this.baseUrl}/genre/movie/list`, { headers: this.headers })
     );
-    return res.results;
+  }
+
+  getFilmPerGenere(genreId: number): Promise<any> {
+    return firstValueFrom(
+      this.http.get(`${this.baseUrl}/discover/movie?with_genres=${genreId}`, { headers: this.headers })
+    );
+  }
+
+  getDettaglioFilm(id: number): Promise<any> {
+    return firstValueFrom(
+      this.http.get(`${this.baseUrl}/movie/${id}?append_to_response=credits`, { headers: this.headers })
+    );
+  }
+
+  // --- SEZIONE SERIE TV ---
+  getSeriePopolari(): Promise<any> {
+    return firstValueFrom(
+      this.http.get(`${this.baseUrl}/tv/popular`, { headers: this.headers })
+    );
+  }
+
+  getGeneriSerie(): Promise<any> {
+    return firstValueFrom(
+      this.http.get(`${this.baseUrl}/genre/tv/list`, { headers: this.headers })
+    );
+  }
+
+  getSeriePerGenere(genreId: number): Promise<any> {
+    return firstValueFrom(
+      this.http.get(`${this.baseUrl}/discover/tv?with_genres=${genreId}`, { headers: this.headers })
+    );
+  }
+
+  getDettaglioSerie(id: number): Promise<any> {
+    return firstValueFrom(
+      this.http.get(`${this.baseUrl}/tv/${id}?append_to_response=credits`, { headers: this.headers })
+    );
+  }
+
+  // --- SEZIONE PERSONE ---
+  getDettaglioPersona(id: number): Promise<any> {
+    return firstValueFrom(
+      this.http.get(`${this.baseUrl}/person/${id}`, { headers: this.headers })
+    );
+  }
+
+  getFilmografiaPersona(id: number): Promise<any> {
+    return firstValueFrom(
+      this.http.get(`${this.baseUrl}/person/${id}/combined_credits`, { headers: this.headers })
+    );
+  }
+
+  // --- RICERCA UNICA ---
+  cercaMulti(query: string): Promise<any> {
+    return firstValueFrom(
+      this.http.get(`${this.baseUrl}/search/multi?query=${encodeURIComponent(query)}`, { headers: this.headers })
+    );
   }
 }

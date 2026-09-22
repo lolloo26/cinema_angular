@@ -1,0 +1,49 @@
+@if (caricamento()) {
+  <p class="caricamento">Caricamento in corso...</p>
+}
+
+@if (errore()) {
+  <p class="errore">{{ errore() }}</p>
+}
+
+@if (dettaglio(); as d) {
+  <div class="dettaglio-container">
+    <img 
+      class="dettaglio-poster" 
+      [src]="tmdb.getImageUrl(d.poster_path)" 
+      [alt]="d.title || d.name" 
+    />
+    <div class="info">
+      <h1>{{ d.title || d.name }}</h1>
+      <p><strong>Voto:</strong> ⭐ {{ d.vote_average }}</p>
+
+      @if (regista(); as r) {
+        <p><strong>Regia:</strong> <a [routerLink]="['/persona', r.id]">{{ r.name }}</a></p>
+      }
+
+      @if (d.genres?.length) {
+        <p>
+          <strong>Generi:</strong>
+          @for (g of d.genres; track g.id; let last = $last) {
+            {{ g.name }}{{ last ? '' : ', ' }}
+          }
+        </p>
+      }
+
+      <p><strong>Trama:</strong> {{ d.overview || 'Trama non disponibile.' }}</p>
+
+      <h2>Cast principale</h2>
+      <div class="cast-list">
+        @for (c of d.credits?.cast?.slice(0, 10); track c.id) {
+          <div class="cast-item" [routerLink]="['/persona', c.id]">
+            <img [src]="tmdb.getImageUrl(c.profile_path, 'w185')" [alt]="c.name" />
+            <p>{{ c.name }}</p>
+            <small>({{ c.character }})</small>
+          </div>
+        } @empty {
+          <p>Nessun membro del cast disponibile.</p>
+        }
+      </div>
+    </div>
+  </div>
+}

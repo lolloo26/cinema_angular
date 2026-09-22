@@ -1,0 +1,35 @@
+<h1>Sezione Film</h1>
+
+<div class="filtri">
+  <label for="select-genere">Filtra per genere: </label>
+  <select id="select-genere" (change)="filtraPerGenere($event)">
+    <option value="0">Tutti (Popolari)</option>
+    @for (g of generi(); track g.id) {
+      <option [value]="g.id">{{ g.name }}</option>
+    }
+  </select>
+</div>
+
+@if (caricamento()) {
+  <p class="caricamento">Caricamento in corso...</p>
+}
+
+@if (errore()) {
+  <p class="errore">{{ errore() }}</p>
+}
+
+@if (!caricamento() && !errore()) {
+  <div class="grid">
+    @for (f of listaFilm(); track f.id) {
+      <div class="card" [routerLink]="['/film', f.id]">
+        <img [src]="tmdb.getImageUrl(f.poster_path)" [alt]="f.title" />
+        <div class="card-body">
+          <h3>{{ f.title }}</h3>
+          <p class="voto">⭐ {{ f.vote_average }}</p>
+        </div>
+      </div>
+    } @empty {
+      <p>Nessun film trovato.</p>
+    }
+  </div>
+}

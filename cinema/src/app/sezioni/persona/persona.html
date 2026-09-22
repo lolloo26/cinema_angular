@@ -1,0 +1,38 @@
+@if (caricamento()) {
+  <p class="caricamento">Caricamento in corso...</p>
+}
+
+@if (errore()) {
+  <p class="errore">{{ errore() }}</p>
+}
+
+@if (info(); as p) {
+  <div class="persona-container">
+    <img class="persona-foto" [src]="tmdb.getImageUrl(p.profile_path)" [alt]="p.name" />
+    <div class="info">
+      <h1>{{ p.name }}</h1>
+      @if (p.birthday) {
+        <p><strong>Data di nascita:</strong> {{ p.birthday }}</p>
+      }
+      @if (p.place_of_birth) {
+        <p><strong>Luogo di nascita:</strong> {{ p.place_of_birth }}</p>
+      }
+      <p><strong>Biografia:</strong> {{ p.biography || 'Nessuna biografia disponibile.' }}</p>
+    </div>
+  </div>
+
+  <h2>Filmografia (Film e Serie TV)</h2>
+  <div class="grid">
+    @for (work of filmografia(); track work.id) {
+      <div class="card" [routerLink]="[work.media_type === 'tv' ? '/serie-tv' : '/film', work.id]">
+        <img [src]="tmdb.getImageUrl(work.poster_path)" [alt]="work.title || work.name" />
+        <div class="card-body">
+          <h3>{{ work.title || work.name }}</h3>
+          <p class="voto">{{ work.media_type === 'tv' ? '📺 Serie TV' : '🎬 Film' }}</p>
+        </div>
+      </div>
+    } @empty {
+      <p>Nessun titolo trovato per questa persona.</p>
+    }
+  </div>
+}
