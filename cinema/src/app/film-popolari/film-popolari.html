@@ -1,0 +1,23 @@
+<h1>Film Popolari</h1>
+
+@if (caricamento()) {
+  <p>Caricamento in corso...</p>
+}
+
+@if (errore()) {
+  <p class="errore">{{ errore() }}</p>
+}
+
+<div class="grid">
+  @for (film of filmList(); track film.id) {
+    <div class="card">
+      <img [src]="tmdbService.getImageUrl(film.poster_path)" [alt]="film.title" />
+      <h3>{{ film.title }}</h3>
+      <p>Voto: {{ film.vote_average }}</p>
+    </div>
+  } @empty {
+    @if (!caricamento()) {
+      <p>Nessun film trovato.</p>
+    }
+  }
+</div>

@@ -1,0 +1,24 @@
+<h1>Cerca Film, Serie TV e Persone</h1>
+
+<div class="search-bar">
+  <input 
+    type="text" 
+    placeholder="Cerca un titolo o personaggio..." 
+    [value]="query()" 
+    (input)="onInput($event)" 
+  />
+  <button (click)="avviaRicerca()" [disabled]="caricamento()">Cerca</button>
+</div>
+
+@if (caricamento()) {
+  <p>Ricerca in corso...</p>
+}
+
+<div class="results">
+  @for (item of risultati(); track item.id) {
+    <div class="item">
+      <strong>[{{ item.media_type | uppercase }}]</strong> 
+      {{ item.title || item.name }}
+    </div>
+  }
+</div>
